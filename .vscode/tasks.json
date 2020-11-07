@@ -36,11 +36,7 @@
             "type": "pickString",
             "options": [
                 "default",
-                "transpobrasil",
-                "lincros",
-                "fca",
-                "santacruz",
-                "souzacruz"
+                "ops"
             ],
             "default": "default"
         }
