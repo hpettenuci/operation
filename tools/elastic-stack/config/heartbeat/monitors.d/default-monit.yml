@@ -1,0 +1,5 @@
+- type: http
+  id: prod-web-server
+  name: External Site
+  schedule: '@every 30s'
+  hosts: ["http://example.com"]

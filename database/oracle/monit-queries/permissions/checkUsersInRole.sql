@@ -1,0 +1,4 @@
+SELECT  * 
+FROM    DBA_ROLE_PRIVS 
+WHERE   GRANTED_ROLE IN (<ROLE NAME LIST>) 
+ORDER   BY grantee, granted_role;

@@ -1,0 +1,48 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Lincros: AWS S3 Sync",
+            "type": "shell",
+            "command": "aws s3 sync ${input:sourceFolder} ${input:destinationFolder} --exact-timestamps --acl bucket-owner-full-control --profile ${input:awsProfile}",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "promptOnClose": true
+        }
+    ],
+    "inputs": [
+        {
+            "id": "sourceFolder",
+            "description": "Source Folder where files that will be sync are saved",
+            "default": "${fileDirname}",
+            "type": "promptString"
+        },
+        {
+            "id": "destinationFolder",
+            "description": "Destination Folder where files that will be synced",
+            "type": "promptString"
+        },        
+        {
+            "id": "awsProfile",
+            "description": "AWS Profile that will be used to execute sync command",
+            "type": "pickString",
+            "options": [
+                "default",
+                "transpobrasil",
+                "lincros",
+                "fca",
+                "santacruz",
+                "souzacruz"
+            ],
+            "default": "default"
+        }
+    ]
+}

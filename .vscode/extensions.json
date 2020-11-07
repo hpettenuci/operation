@@ -1,0 +1,27 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=827846 to learn about workspace recommendations.
+	// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+
+	// List of extensions which should be recommended for users of this workspace.
+	"recommendations": [
+		"amazonwebservices.aws-toolkit-vscode",
+		"ms-azuretools.vscode-docker",
+		"ms-kubernetes-tools.vscode-kubernetes-tools",
+		"ms-vscode.powershell",
+		"ms-python.python",
+		"ms-vscode-remote.remote-wsl",
+		"mauve.terraform",
+		"erd0s.terraform-autocomplete",
+		"visualstudioexptteam.vscodeintellicode",
+		"pkief.material-icon-theme",
+		"owenfarrell.vscode-vault",
+		"hashicorp.terraform",
+		"wholroyd.hcl",
+		"2gua.rainbow-brackets",
+		"oderwat.indent-rainbow"
+	],
+	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
+	"unwantedRecommendations": [
+		
+	]
+}

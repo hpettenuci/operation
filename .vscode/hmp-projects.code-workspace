@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"Name": "Operation",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"editor.fontFamily": "'Fira Code',Consolas, 'Courier New', monospace",
+		"editor.fontLigatures": true,
+		"explorer.sortOrder": "type",
+		"files.trimFinalNewlines": true,
+		"workbench.editor.highlightModifiedTabs": true,
+	}
+}

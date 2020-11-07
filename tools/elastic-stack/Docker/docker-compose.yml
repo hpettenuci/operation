@@ -1,0 +1,135 @@
+version: "3.7"
+
+services:
+  elasticsearch-1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: elasticsearch-1
+    hostname: elasticsearch-1
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=certs/elasticsearch-1/elasticsearch-1.key
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.certificate=certs/elasticsearch-1/elasticsearch-1.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch-1/elasticsearch-1.crt
+      - xpack.security.transport.ssl.key=certs/elasticsearch-1/elasticsearch-1.key
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    volumes:
+      - es-data-1:/usr/share/elasticsearch/data
+      - certs:/usr/share/elasticsearch/config/certs
+    ports:
+      - 9200:9200
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    container_name: kibana
+    hostname: kibana
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: https://elasticsearch-1:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES: /etc/kibana/config/certs/ca/ca.crt
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY: /etc/kibana/config/certs/kibana.key
+      SERVER_SSL_CERTIFICATE: /etc/kibana/config/certs/kibana.crt
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY}
+    ports:
+      - 5601:5601
+    volumes:
+      - certs:/etc/kibana/config/certs
+    depends_on:
+      - elasticsearch-1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+
+  heartbeat:
+    image: docker.elastic.co/beats/heartbeat:${ELASTIC_VERSION}
+    container_name: heartbeat
+    hostname: heartbeat
+    user: heartbeat
+    dns:
+      - 1.1.1.2
+      - 8.8.4.4
+    volumes:
+      - certs:/etc/pki
+      - ${VOLUME_DATA_PATH}/heartbeat/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+      - heartbeat-monit:/usr/share/heartbeat/monitors.d
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:${ELASTIC_VERSION}
+    container_name: apm-server
+    hostname: apm-server
+    ports: 
+      - 8200:8200
+    volumes:
+      - certs:/etc/pki
+      - apm-cfg-tms:/usr/share/apm-server
+    depends_on:
+      - elasticsearch-1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+
+  apm-srv-router:
+    image: docker.elastic.co/apm/apm-server:${ELASTIC_VERSION}
+    container_name: apm-srv-router
+    hostname: apm-srv-router
+    ports: 
+      - 8200:8200
+    volumes:
+      - certs:/etc/pki
+      - ${VOLUME_DATA_PATH}/apm-server/apm-server-router.yml:/usr/share/apm-server/apm-server.yml
+    depends_on:
+      - elasticsearch-1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+
+volumes:
+  es-data-1:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DATA_PATH}/elasticsearch-1
+      o: bind
+  certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DATA_PATH}/certs
+      o: bind
+  apm-cfg-tms:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DATA_PATH}/apm-server
+      o: bind
+  heartbeat-monit:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DATA_PATH}/heartbeat/monitors.d
+      o: bind

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#Host Infos
+HOSTNAME=""
+SSH_PORT=""
+
+# Credentials and key
+USERNAME=""
+SSH_PASS=""
+SSH_KEYS=""
+
+# Tunnel Configuration
+REMOTE_PORT=""
+REMOTE_HOST=""
+LOCAL_PORT=""
+TUNNEL_CMD="-L ${LOCAL_PORT}:${REMOTE_HOST}:${REMOTE_PORT}"
+
+# Connection Proprieties
+CON_TYPE=""  # P - user and pass | K - user and key | M - MFA Required
+MFA_NAME=""
+REM_KNWN="N"  # Y - Remove know host | N - Don't remove know host
+
+if [ "${REM_KNWN}" == "Y" ]; then
+    ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${HOSTNAME}" 2> /dev/null
+fi
+
+if [ "${CON_TYPE}" == "P" ]; then
+    sshpass -p $SSH_PASS ssh -o ConnectTimeout=15 -oStrictHostKeyChecking=no -t -p $SSH_PORT "${USERNAME}@${HOSTNAME}"
+elif [ "${CON_TYPE}" == "K" ]; then
+    ssh -i $SSH_KEYS "${USERNAME}@${HOSTNAME}" -p $SSH_PORT
+elif [ "${CON_TYPE}" == "M" ]; then
+    /mnt/c/access/mfaCodes.sh $MFA_NAME
+    echo "Pass: ${SSH_PASS}"
+    ssh -p $SSH_PORT "${USERNAME}@${HOSTNAME}"
+else
+    echo "Invalid connection type!"
+fi

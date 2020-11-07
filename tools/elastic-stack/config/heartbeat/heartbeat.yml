@@ -1,0 +1,23 @@
+heartbeat.config.monitors:
+  path: /usr/share/heartbeat/monitors.d/*.yml
+  reload.enabled: true
+  reload.period: 1m
+
+
+processors:
+  - add_observer_metadata:
+      geo:
+        name: us-east-1
+        location: 37.444167, -76.406389
+        continent_name: North America
+        country_iso_code: US
+        region_name: us-east-1
+        region_iso_code: VA
+        city_name: North Virginia
+
+output.elasticsearch:
+  hosts: 'https://elasticsearch:9200'
+  username: 'elastic'
+  password: 'elastic'
+  ssl:
+    certificate_authorities: ["/etc/pki/ca/ca.crt"]
