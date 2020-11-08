@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  vault:
+    image: vault:latest
+    container_name: vault
+    hostname: vault
+    ports: 
+      - "8200:8200"
+      - "8201:8201"
+    volumes:
+      - vault-storage:/vault/file
+      - vault-logs:/vault/logs
+    cap_add:
+      - IPC_LOCK
+    env_file: 
+      - .env.list
+    command: server -log-level="trace"  
+    deploy:
+      replicas: 1
+      restart_policy: 
+        condition: always
+        delay: 10s
+
+volumes:
+  vault-storage:
+  vault-logs:

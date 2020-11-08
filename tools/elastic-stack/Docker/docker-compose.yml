@@ -82,7 +82,7 @@ services:
       - 8200:8200
     volumes:
       - certs:/etc/pki
-      - apm-cfg-tms:/usr/share/apm-server
+      - apm-cfg:/usr/share/apm-server
     depends_on:
       - elasticsearch-1
     deploy:
@@ -91,21 +91,25 @@ services:
         condition: any
         delay: 10s
 
-  apm-srv-router:
-    image: docker.elastic.co/apm/apm-server:${ELASTIC_VERSION}
-    container_name: apm-srv-router
-    hostname: apm-srv-router
-    ports: 
-      - 8200:8200
-    volumes:
-      - certs:/etc/pki
-      - ${VOLUME_DATA_PATH}/apm-server/apm-server-router.yml:/usr/share/apm-server/apm-server.yml
-    depends_on:
-      - elasticsearch-1
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION}
+    container_name: metricbeat
+    hostname: metricbeat
+    user: root
+    environment: 
+      - setup.kibana.host=kibana:5601
+      - output.elasticsearch.hosts=["elasticsearch-1:9200"]
+    volumes: 
+      - ${VOLUME_DATA_PATH}/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - metricbeat-monit:/usr/share/metricbeat/monitors.d
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
     deploy:
       replicas: 1
-      restart_policy:
-        condition: any
+      restart_policy: 
+        condition: always
         delay: 10s
 
 volumes:
@@ -121,7 +125,7 @@ volumes:
       type: none
       device: ${VOLUME_DATA_PATH}/certs
       o: bind
-  apm-cfg-tms:
+  apm-cfg:
     driver: local
     driver_opts:
       type: none
@@ -132,4 +136,10 @@ volumes:
     driver_opts:
       type: none
       device: ${VOLUME_DATA_PATH}/heartbeat/monitors.d
+      o: bind
+  metricbeat-monit:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DATA_PATH}/metricbeat/monitors.d
       o: bind
