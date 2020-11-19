@@ -1,0 +1,2 @@
+boto3==1.16.19
+requests-aws4auth==1.0.1
