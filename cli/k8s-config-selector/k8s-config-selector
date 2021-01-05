@@ -1,0 +1,35 @@
+#!/bin/python3
+
+import os,sys
+from shutil import copyfile
+
+HOME_PATH = os.environ['HOME']
+CONF_PATH = HOME_PATH + "/.kube/conf.d"
+CONF_FILE = HOME_PATH + "/.kube/config"
+
+if (not os.path.exists(CONF_PATH)):
+    print("=> Config path not exists!")
+    os.mkdir(CONF_PATH)
+    print("Conf file was created - " + CONF_PATH)
+    print("Please save your Kubernets config files there")
+
+filesList = os.listdir(CONF_PATH)
+selectorObject = []
+
+print("=> Kubernetes configuration file list:")
+for idx,file in enumerate(filesList):
+    selectorObject.append({
+        'index': idx,
+        'file': file
+    })
+    print(str(idx) + " - " + file)
+
+optionSelected = int(input("> Select file typing the number: "))
+selectedFile = [x for x in selectorObject if x['index'] == optionSelected][0]
+
+try:
+    copyfile(CONF_PATH + "/" + selectedFile["file"], CONF_FILE)
+except IOError as e:
+    print("Unable to copy file. %s" % e)
+except:
+    print("Unexpected error:", sys.exc_info())
