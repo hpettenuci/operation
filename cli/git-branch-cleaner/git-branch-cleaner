@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo "Please inform the git folder"
+  exit 1
+fi
+
+GIT_PATH=$1
+
+cd $GIT_PATH
+echo "Merged local branches:"
+git  branch --merged | egrep -v "(^\*|master|dev)"
+
+while true; do
+    read -p 'Delete these branches?[Y/n] ' delete
+    case $delete in
+        [yY][eE][sS]|[yY])
+          git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+          break
+          ;;
+        [nN][oO]|[nN])
+          echo "No"
+          break
+          ;;
+    esac
+done
+
+cd - >> /dev/null
