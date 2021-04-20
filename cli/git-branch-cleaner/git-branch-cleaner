@@ -8,20 +8,25 @@ fi
 GIT_PATH=$1
 
 cd $GIT_PATH
-echo "Merged local branches:"
-git  branch --merged | egrep -v "(^\*|master|dev)"
+return=$(git  branch --merged | egrep -v "(^\*|master|dev)")
 
-while true; do
-    read -p 'Delete these branches?[Y/n] ' delete
-    case $delete in
-        [yY][eE][sS]|[yY])
-          git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
-          break
-          ;;
-        [nN][oO]|[nN])
-          break
-          ;;
-    esac
-done
+if [[ $return ]]; then
+    echo "Merged local branches:"
+    echo $return
+    while true; do
+        read -p 'Delete these branches?[Y/n] ' delete
+        case $delete in
+            [yY][eE][sS]|[yY])
+              git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+              break
+              ;;
+            [nN][oO]|[nN])
+              break
+              ;;
+        esac
+    done
+else
+    echo "No branches to clean!"
+fi
 
 cd - >> /dev/null
